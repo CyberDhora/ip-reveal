@@ -1,57 +1,263 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>IP Reveal</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Reveal Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 25px 20px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .ip-display {
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .ip-address {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+
+        .copy-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .details {
+            background: #f8f9fa;
+            padding: 30px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .details h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .info-item h3 {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .info-item p {
+            color: #2c3e50;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .ip-address {
+                font-size: 2.2rem;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .ip-address {
+                font-size: 1.8rem;
+            }
+            
+            .details {
+                padding: 20px 15px;
+            }
+        }
+    </style>
 </head>
-<body class="min-h-screen bg-gray-50 text-gray-900">
-  <main class="max-w-xl mx-auto px-4 py-20 text-center">
-    <h1 class="text-3xl sm:text-4xl font-bold mb-6">🔍 Your IP Address</h1>
-
-    <div class="bg-white shadow rounded-2xl p-8">
-      <div id="ip" class="text-3xl sm:text-4xl font-mono font-bold">Loading…</div>
-      <div id="location" class="text-sm text-gray-600 mt-3">Fetching location…</div>
-
-      <div class="mt-6 flex justify-center gap-3">
-        <button id="copyBtn" class="px-4 py-2 rounded-lg bg-black text-white text-sm">Copy</button>
-        <button id="refreshBtn" class="px-4 py-2 rounded-lg border text-sm">Refresh</button>
-      </div>
+<body>
+    <div class="container">
+        <header>
+            <h1>IP Reveal Tool</h1>
+            <p class="description">Discover your public IP address and location information</p>
+        </header>
+        
+        <div class="ip-display">
+            <p>Your IP Address is:</p>
+            <div class="ip-address" id="ipAddress">Loading...</div>
+            <button class="copy-btn" id="copyBtn">Copy IP Address</button>
+        </div>
+        
+        <div class="details">
+            <h2>Connection Details</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <h3>Country</h3>
+                    <p id="country">Loading...</p>
+                </div>
+                <div class="info-item">
+                    <h3>Region</h3>
+                    <p id="region">Loading...</p>
+                </div>
+                <div class="info-item">
+                    <h3>City</h3>
+                    <p id="city">Loading...</p>
+                </div>
+                <div class="info-item">
+                    <h3>ISP</h3>
+                    <p id="isp">Loading...</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Note: This shows your public IP address, which is visible to websites you visit.</p>
+        </footer>
     </div>
-  </main>
 
-  <script>
-    const ipEl = document.getElementById("ip");
-    const locEl = document.getElementById("location");
-    const copyBtn = document.getElementById("copyBtn");
-    const refreshBtn = document.getElementById("refreshBtn");
-
-    async function loadIp() {
-      ipEl.textContent = "Loading…";
-      locEl.textContent = "Fetching…";
-      try {
-        // Free public API
-        const res = await fetch("https://ipapi.co/json/");
-        const data = await res.json();
-        ipEl.textContent = data.ip || "Unavailable";
-        locEl.textContent = `${data.city}, ${data.region}, ${data.country_name}`;
-      } catch (e) {
-        ipEl.textContent = "Error";
-        locEl.textContent = "Could not fetch data";
-      }
-    }
-
-    copyBtn.addEventListener("click", () => {
-      navigator.clipboard.writeText(ipEl.textContent).then(() => {
-        copyBtn.textContent = "Copied!";
-        setTimeout(() => (copyBtn.textContent = "Copy"), 1200);
-      });
-    });
-
-    refreshBtn.addEventListener("click", loadIp);
-
-    loadIp();
-  </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ipAddressElement = document.getElementById('ipAddress');
+            const countryElement = document.getElementById('country');
+            const regionElement = document.getElementById('region');
+            const cityElement = document.getElementById('city');
+            const ispElement = document.getElementById('isp');
+            const copyButton = document.getElementById('copyBtn');
+            
+            // Show loading state
+            ipAddressElement.innerHTML = '<div class="loader"></div>';
+            
+            // Fetch IP information
+            fetch('https://ipapi.co/json/')
+                .then(response => response.json())
+                .then(data => {
+                    // Update the page with IP information
+                    ipAddressElement.textContent = data.ip;
+                    countryElement.textContent = data.country_name;
+                    regionElement.textContent = data.region;
+                    cityElement.textContent = data.city;
+                    ispElement.textContent = data.org;
+                })
+                .catch(error => {
+                    console.error('Error fetching IP information:', error);
+                    ipAddressElement.textContent = 'Unable to retrieve IP';
+                    countryElement.textContent = 'Error';
+                    regionElement.textContent = 'Error';
+                    cityElement.textContent = 'Error';
+                    ispElement.textContent = 'Error';
+                });
+            
+            // Copy IP to clipboard functionality
+            copyButton.addEventListener('click', function() {
+                const ip = ipAddressElement.textContent;
+                
+                if (ip === 'Loading...' || ip === 'Unable to retrieve IP') {
+                    return;
+                }
+                
+                navigator.clipboard.writeText(ip)
+                    .then(() => {
+                        copyButton.textContent = 'Copied!';
+                        setTimeout(() => {
+                            copyButton.textContent = 'Copy IP Address';
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy: ', err);
+                    });
+            });
+        });
+    </script>
 </body>
 </html>
