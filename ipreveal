@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IP Reveal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-50 text-gray-900">
+  <main class="max-w-xl mx-auto px-4 py-20 text-center">
+    <h1 class="text-3xl sm:text-4xl font-bold mb-6">🔍 Your IP Address</h1>
+
+    <div class="bg-white shadow rounded-2xl p-8">
+      <div id="ip" class="text-3xl sm:text-4xl font-mono font-bold">Loading…</div>
+      <div id="location" class="text-sm text-gray-600 mt-3">Fetching location…</div>
+
+      <div class="mt-6 flex justify-center gap-3">
+        <button id="copyBtn" class="px-4 py-2 rounded-lg bg-black text-white text-sm">Copy</button>
+        <button id="refreshBtn" class="px-4 py-2 rounded-lg border text-sm">Refresh</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const ipEl = document.getElementById("ip");
+    const locEl = document.getElementById("location");
+    const copyBtn = document.getElementById("copyBtn");
+    const refreshBtn = document.getElementById("refreshBtn");
+
+    async function loadIp() {
+      ipEl.textContent = "Loading…";
+      locEl.textContent = "Fetching…";
+      try {
+        // Free public API
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+        ipEl.textContent = data.ip || "Unavailable";
+        locEl.textContent = `${data.city}, ${data.region}, ${data.country_name}`;
+      } catch (e) {
+        ipEl.textContent = "Error";
+        locEl.textContent = "Could not fetch data";
+      }
+    }
+
+    copyBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText(ipEl.textContent).then(() => {
+        copyBtn.textContent = "Copied!";
+        setTimeout(() => (copyBtn.textContent = "Copy"), 1200);
+      });
+    });
+
+    refreshBtn.addEventListener("click", loadIp);
+
+    loadIp();
+  </script>
+</body>
+</html>
